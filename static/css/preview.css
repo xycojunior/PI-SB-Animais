@@ -213,7 +213,7 @@ a.control_next {
   font-size: 26px;
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
-  padding-top: 20px;
+  padding-top: 50px;
 }
 
 .gridContainer {
@@ -222,19 +222,19 @@ a.control_next {
   grid-template-areas: "mainContent";
   padding: 20px;
   flex: 1 0 auto;
-  margin: 0 100px 0 100px;
+  margin: 0 10%;
 }
 .mainContent {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 15px;
+  gap: 50px;
   grid-area: "mainContent";
   margin: 10px;
 }
 .categoryCard {
-  width: 280px;
-  height: 0 auto;
+  width: 308px;
+  height: auto;
   border: 1px solid rgba(0, 0, 0, 0.247);
   border-radius: 10px;
   transition: 0.5s;
