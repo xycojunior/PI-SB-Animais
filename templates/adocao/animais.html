@@ -5,6 +5,7 @@
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/preview.css' %}">
     <script src="{% static 'js/animais.js' %}"></script>
+    <script src="{% 'https://code.jquery.com/jquery-3.6.0.min.js' %}"></script>
 {% endblock head %}
 
 {% block content %}
@@ -17,10 +18,21 @@
               {% include '../componentes/pesquisaPet.html' %}
 
         
-              <section class="slider">
-        
-        
-              </section>
+              <div id="slider">
+                <a href="#" class="control_next">></a>
+                <a href="#" class="control_prev"><</a>
+                <ul>
+                  <li> <a href=""><img src="" alt="">slide1</a></li>
+                  <li> <a href=""><img src="" alt="">slide2</a> </li>
+                  <li> <a href=""><img src="" alt="">slide3</a> </li>
+                  <li> <a href=""><img src="" alt="">slide4</a> </li>
+                </ul>  
+              </div>
+              
+              <div class="slider_option">
+                <input type="checkbox" id="checkbox" checked>
+                <label for="checkbox">Autoplay</label>
+              </div> 
         
               <section class="animais">
         
