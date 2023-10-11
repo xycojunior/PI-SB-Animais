@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block content %}
+
+{% include '../componentes/nav.html' %}
 <div class="form-section">
     <form method="POST" action="{% url 'uploadPet' %}" enctype="multipart/form-data" id="petForm">
         {% csrf_token %}
@@ -40,16 +42,26 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div>
+                        <label for="perdido">perdido</label>
+                        <input type="radio" name="identificador" id="perdido" value="perdido">
+                        <label for="adocao">adocao</label>
+                        <input type="radio" name="identificador" id="adocao" value="adocao">
+                    </div>
                 </div>
             <button type="submit" class="submitButton">Cadastrar Pet</button>
         </div>
     
-        <div>
+        <div class="media-form-container">
             {{ imgForm.management_form }}
             <div class="images-forms">
                 {% for field in imgForm %}
                     <div class="ImagemFormset">
-                        <div class="img-preview-container"><button type="button" class="selectImageButton">Selecionar</button></div>
+                        <div class="img-preview-container">
+                                <img src="" alt="" id="image-0" class="preview-image">
+                        </div>
+                        <button type="button" class="selectImageButton" id="0">+</button>
                         <div class="hidden">{{field}}</div>
                     </div>
                 {% endfor %}
@@ -67,44 +79,70 @@
 
 {% block scripts %}
 <script type="text/javascript">
-    count = 1
-    var selectButtons =  document.getElementsByClassName('selectImageButton')
-    selectButtons[0].setAttribute('id', 0)
-    for(button of selectButtons){
-        button.addEventListener('click', () => {
-            open(button)
-        })
+    function open(e){
+        let id = e.target.getAttribute('id')
+        stringId = 'id_imagem_pet-' + id + '-imagem'
+        imgInp = document.getElementById(stringId)
+        img = document.getElementById('image-' + id)
+        console.log(img)
+        imgInp.click()
+        imgInp.onchange = evt => {
+        const [file] = imgInp.files
+        if (file) {
+            img.src = URL.createObjectURL(file)
+            img.classList.add('focus')
+        }
+}
     }
+
+    let selectButtons = null
+   
+
+
     $(async function() {
         $('.ImagemFormset').formset({
-            prefix: '{{ imgForm.prefix }}', addText: 'Adicionar'
+            prefix: '{{ imgForm.prefix }}', addText: '<div>+</div>'
         })
 
-
-
-        var addButton = await document.getElementsByClassName('add-row')[0]
-        addButton.addEventListener('click', attButton)
-        
-        var removeButton = await document.getElementsByClassName('delete-row')[0]
-        removeButton.remove()
-    })
-
-
-    function attButton(){
-        selectButtons = document.querySelectorAll('.selectImageButton')
-        selectButtons.forEach((element, index) => {
-            selectButtons[index].setAttribute('id', index)
-            selectButtons[index].addEventListener('click', () => {
-                open(selectButtons[index])
+        function attButtons(){
+            selectButtons = document.querySelectorAll('.selectImageButton')
+            selectButtons.forEach((button, index) => {
+                if(index != 0){
+                    button.setAttribute('id', index)
+                    button.addEventListener('click', open)
+                    console.log(button)
+                }
             })
-        });
-    }
 
-    function open(button){
-        id = 'id_imagem_pet-' + button.id + '-imagem'
-        document.getElementById(id).click()
-    }
+            let imagePre = document.querySelectorAll('.preview-image')
+            console.log(imagePre)
+            imagePre.forEach((image, index) => {
+                image.setAttribute('id', 'image-' + index)
+            })
+        }
 
+        addButton = document.querySelector('.add-row')
+        addButton.addEventListener('click', attButtons)
+
+        let deleteButton = await document.getElementsByClassName('delete')[0]
+        deleteButton.classList.add('hidden')
+
+        let dynamicForm = document.querySelector('.dynamic-form')
+        dynamicForm.addEventListener('click', clickAdd)
+
+        function clickAdd(e){
+            let firstInputImage = document.querySelector('#id_imagem_pet-0-imagem')
+            firstInputImage.click()
+            img = document.getElementById('image-0')
+            firstInputImage.onchange = evt => {
+            const [file] = firstInputImage.files
+            if (file) {
+            img.src = URL.createObjectURL(file)
+            img.classList.add('focus')
+            }
+        }
+        }
+    })
 
 
 </script>

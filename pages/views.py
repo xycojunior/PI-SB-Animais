@@ -10,15 +10,21 @@ from django.utils.decorators import method_decorator
 from .decorator import *
 from django.forms.models import inlineformset_factory
 from datetime import date
+from django.core.paginator import Paginator
 # Create your views here.
 
 def landingPage(request):
     return render(request, 'homeOficial.html')
 
 class homePage(View):
-    @method_decorator(login_required)
+    #@method_decorator(login_required)
     def get(self, request):
-        pet_list = Pet.objects.all()
+        search = request.GET.get('search')
+        
+        if search:
+            pet_list = Pet.objects.filter(raca__icontains = search)
+        else:
+            pet_list = Pet.objects.all()
         pets = []
         for pet in pet_list:
             imgs = ImagemPet.objects.filter(fk_pet = pet)
@@ -30,15 +36,15 @@ class homePage(View):
                 }
             )
         if request.user.is_authenticated:
-            
-            defaultUser = DefaultUser.objects.get(fk_user = request.user)
             context = {
-                'defaultUser' : defaultUser,
+                'User' : request.user,
                 'pets' : pets
             }
-            return render(request, 'adocao/home.html', context)
         else:
-            print("vv")
+            context = {
+                'pets' : pets
+            }
+        return render(request, 'adocao/animais.html', context)
 
 
             
@@ -50,6 +56,7 @@ class adicionarPet(View):
         imgForm = CadastrarPetFormset()
 
         context = {
+            'User':request.user,
             'form':form,
             'imgForm':imgForm
         }
@@ -62,14 +69,26 @@ class adicionarPet(View):
         dt_ent = date.today()
 
         if form.is_valid() and imgForm.is_valid():
-            pet = form.save(commit=False)
-            pet.fk_user = request.user
-            pet.save()
+            if request.POST.get('identificador') == "adocao":
+                pet = form.save(commit=False)
+                pet.fk_user = request.user
+                pet.save()
 
-            log_entrada = LogEntrada.objects.create(fk_doador=request.user, raca=pet.raca, sexo=pet.sexo, dt_entrada=dt_ent)
+                imgForm.instance = pet
+                imgForm.save()
 
-            imgForm.instance = pet
-            imgForm.save()
+                log_entrada = LogEntrada.objects.create(fk_doador=request.user, raca=pet.raca, sexo=pet.sexo, dt_entrada=dt_ent)
+            else:
+                pet = form.save(commit=False)
+                pet.fk_user = request.user
+                pet.save()
+
+                imgForm.instance = pet
+                imgForm.save()
+
+                log_entrada = LogEntrada.objects.create(fk_doador=request.user, raca=pet.raca, sexo=pet.sexo, dt_entrada=dt_ent)
+                animaisPerdidos = AnimaisPerdidos.objects.create(fk_pet=pet)
+
 
             return redirect('/meus_Pets/')
         else:
@@ -90,6 +109,7 @@ class editarPet(View):
         imgForm_factory = inlineformset_factory(Pet, ImagemPet, form=CadastroImagemForm, extra=0)
         imgForm = imgForm_factory(instance=pet)
         context = {
+            'User' : request.user,
             'form' : form,
             'imgForm' : imgForm,
             'action': reverse('editarPet', args=[id])
@@ -112,18 +132,62 @@ class editarPet(View):
 class meusPets(View):
     @method_decorator(login_required)
     def get(self, request,):
+        page = request.GET.get('page') if request.GET.get('page') != None else 1
+        petName = request.GET.get('petName') if request.GET.get('petName') != None else ''
+    
         pets = []
 
 
-        for pet in Pet.objects.filter(fk_user = request.user):
+        for pet in reversed(Pet.objects.filter(fk_user = request.user).filter(nome__istartswith=petName)):
             imgs = ImagemPet.objects.filter(fk_pet = pet)
             pets.append(
-                {'pet' : pet,
-                 'imgs': imgs}
+                {
+                    'pet' : pet,
+                    'imgs': imgs}
                 )
 
+
+        p = Paginator(pets, 8)
+        pages = p.num_pages
+
+        if int(page) < 1 or int(page) > int(pages):
+            page = 1
+
+        pet_page = p.get_page(page)
+        nextPage = int(page) + 1
+        prevPage = int(page) - 1
+
         context = {
+            'pets' : pet_page,
+            'page' : int(page),
+            'nextPage' : nextPage, 
+            'prevPage' : prevPage,
+            'pages': int(pages),
+            'petName' : petName,
+        }
+        
+        return render(request, 'adocao/pets.html', context)
+
+class petsPerdidos(View):
+    @method_decorator(login_required)
+    def get(self, request):
+        search = request.GET.get('search')
+        if search:
+            pet_list = AnimaisPerdidos.objects.filter(fk_pet__raca__contains = search)
+        else:
+            pet_list = AnimaisPerdidos.objects.all()
+        
+        pets = []
+        for petPerdido in pet_list:
+            imgs = ImagemPet.objects.filter(fk_pet = petPerdido.fk_pet)
+            pets.append(
+                {
+                    'pet'  : petPerdido.fk_pet,
+                    'imgs' : imgs, 
+                }
+            )
+        context = {
+            'User': request.user,
             'pets' : pets
         }
-
-        return render(request, 'adocao/pets.html', context)
+        return render(request, 'perdidos/petsPerdidos.html', context)
