@@ -113,8 +113,8 @@ h1 {
   line-height: 300px;
 }
 #slider ul li a img {
-  width: 300px;
-  height: 300px;
+  width: 0;
+  height: 0;
 } /*mude a prporção da img*/
 
 a.control_prev,
@@ -276,14 +276,9 @@ a.control_next {
 .mainCategoryCardDescription {
   padding: 10px;
 }
-
-footer {
-  display: flex;
-  height: auto;
-  justify-content: space-evenly;
-  padding: 90px 80px;
+.my-pets{
+  width: 100px;
 }
-
 .copyDown {
   display: flex;
   justify-content: space-around;
