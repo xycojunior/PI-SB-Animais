@@ -1,3 +1,6 @@
+
+{% load static %}
+
 <style>
     .modal-pet-container{
         position: fixed;
@@ -17,7 +20,7 @@
         background-color: white;
         display: flex;
         width: 800px;
-        height: 550px;
+        min-height: 550px;
         border-radius: 10px;
         overflow: hidden;
     }
@@ -30,6 +33,10 @@
         width: 52%;
         overflow: hidden;
         position: relative;
+        background-image: url(/static/imgs/dogplaceholder.png);
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
     }
 
     .carrousel-content{
@@ -51,7 +58,17 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1rem;
+        padding: 0 1.2rem;
     }
+
+    .modal-top h3{
+        font-weight: bolder;
+    }
+
+    #exit-modal-button{
+        width: 12%;
+    }
+
 
     .pet-info{
         background-color: var(--greenBackground);
@@ -101,10 +118,10 @@
     }
 
     .carrousel-indicator{
-        height: 25px;
+        height: 12px;
         border-radius: 50%;
-        width: 25px;
-        margin-left: 1rem;
+        width: 12px;
+        margin-left: 0.7rem;
         background-color: lightgreen;
     }
 
@@ -126,7 +143,7 @@
     }
 
     .ud-options button{
-        background-color: var(--greenSecondary);
+        background-color: var(--greenPrincipal);
         color: white;
         border: none;
         border-radius: 10px;
@@ -137,9 +154,71 @@
     }
 
     .ud-options button:hover{
-        background-color: var(--greenPrincipal);
+        background-color: var(--greenSecondary);
         color: white;
     }
+
+    .trigger-before{
+        width: 50%;
+        height: 100%;
+        position: absolute;
+        display: flex;
+        z-index: 20;
+        top: 0;
+        left: 0;
+        transition: 0.2s;
+        background: linear-gradient(to right,  rgba(0, 0, 0, 0.145), transparent);
+        opacity: 0;
+        align-items: center;
+    }
+
+    .trigger-before:hover{
+        opacity: 1;
+    }
+    
+    .trigger-after{
+        width: 50%;
+        height: 100%;
+        position: absolute;
+        display: flex;
+        z-index: 20;
+        top: 0;
+        right: 0;
+        background: linear-gradient(to left,  rgba(0, 0, 0, 0.145), transparent);
+        opacity: 0;
+        flex-direction: row-reverse;
+        align-items: center;
+        
+    }
+
+    .trigger-after:hover{
+        opacity: 1;
+    }
+
+    .trigger-before, .trigger-after{
+        cursor: pointer;
+    }
+
+    .arrow-right, .arrow-left{
+        background-color: var(--greenPrincipal);
+        color: white;
+        width: 50px;
+        height: 50px;
+        line-height: 40px;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bolder;
+        border-radius: 50%;
+    }
+
+    .arrow-right{
+        margin-right: 2rem;
+    }
+
+    .arrow-left{
+        margin-left: 2rem;
+    }
+
     
 
 </style>
@@ -152,19 +231,26 @@
                     <img src="{{img.imagem.url}}" alt="pet image" class="pet-modal-img">
                 {% endfor %}
             </div>
+
             <div class="carrousel-indicators">
                 {% for img in pet.imgs %}
                     <div class="carrousel-indicator carrousel-indicator-{{pet.pet.id}}"></div>
                 {% endfor %}
             </div>
+            <div class="trigger-before" id="triggerBefore-{{pet.pet.id}}"><div class="arrow-left"><</div></div>
+            <div class="trigger-after" id="triggerAfter-{{pet.pet.id}}"><div class="arrow-right">></div></div>
         </div>
         <div class="pet-info-container">
             <div class="modal-top">
                 <h3>{{pet.pet.nome}}</h3>
-                <div>x</div>
+                <img src="{% static 'imgs/iconx.svg' %}" alt="X icon" id="exit-modal-button">
             </div>
             <div class="pet-info">
                 <ul>
+                    <li>
+                        <span class="info-header">Doador</span>
+                        <span class="info-content">{{pet.pet.fk_user.first_name}}</span>
+                    </li>
                     <li>
                         <span class="info-header">Nome</span>
                         <span class="info-content">{{pet.pet.nome}}</span>
@@ -191,9 +277,20 @@
                     </li>
                 </ul>
             </div>
+
+                {% if type == 'Meus Pets' %}
                 <a href="{% url 'editarPet'  pet.pet.id  %}" class="ud-options"><button>Editar Pet</button></a>
                 <a href="" class="ud-options"><button>Excluir Pet</button></a>
+
+                {% elif type == 'Adoção' %}
+
+                <a href="{% url 'favoritarPet' pet.pet.id %}" class="ud-options"><button>Tenho Interesse</button></a>
+                <a href="{% url 'adotarPet' pet.pet.id pet.pet.fk_user.id %}" class="ud-options"><button>Adotar</button></a>
+
+                {% elif type == 'Perdido' %}
+                <a href="{% url 'editarPet'  pet.pet.id  %}" class="ud-options"><button>Editar Pet</button></a>
+                <a href="" class="ud-options"><button>Excluir Pet</button></a>
+                {% endif %}
         </div>
     </div>
 </div>
-

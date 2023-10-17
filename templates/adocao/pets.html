@@ -12,11 +12,13 @@
     {% include 'componentes/petModal.html' %}
 {% endfor %}
 
+{% include '../componentes/nav.html' %}
+
 <main class="pets-section">
     <h1>Meus Pets</h1>
 
-    <form action="{% url 'meusPets'%}" class="search-pet-form">
-        <input type="text" name="petName" placeholder="Digite o nome do Pet">
+    <form action="" class="search-pet-form">
+        <input type="text" name="Search" placeholder="Digite o nome do Pet">
         <button>Search</button>
     </form>
 
@@ -28,83 +30,17 @@
     {% include 'componentes/paginator.html' %}
 </main>
 
-<script>
-    let carrouselInterval = null
-    let carrouselIndicators = null
+<section class="mid-3">
+    <div class="mid-3-1">
+        <img src="{% static 'imgs/geometryShapes_background.svg' %}" alt="background shapes" class="background-shapes">
+        <div class="description-mid-3-1">
+            <h3>Faça igual a eles vire um parceiro da AdotePet</h3>
+            <button class="parceiro">Seja um Parceiro</button>
+        </div>
+    </div>
+</section>
 
-    let petCards = document.querySelectorAll('.pet-card')
-    petCards.forEach(card => {
-        card.addEventListener('click', openPetModal)
-    })
+{% include '../componentes/footer.html' %}
 
-    function triggerCarrousel(carrousel, indicators){
-        let i = 0
-        numImgs = carrousel.childElementCount
-        moveQuantity = 0;
-        indicators[0].classList.add('indicator-active')
-        if (numImgs > 1){
-            carrouselInterval = setInterval(() => {
-                i+=1
-                if (i > (numImgs - 1)){
-                    moveQuantity = 0
-                    i = 0
-                    carrousel.style.transform = 'translateX(-'+ moveQuantity +'%)'
-                    indicators.forEach(indicator=>{
-                        indicator.classList.remove('indicator-active')
-                    })
-                    indicators[0].classList.add('indicator-active')
-                }
-                else{
-                    moveQuantity += 100
-                    carrousel.style.transform = 'translateX(-'+ moveQuantity +'%)'
-                    indicators.forEach(indicator=>{
-                        indicator.classList.remove('indicator-active')
-                    })
-                    indicators[i].classList.add('indicator-active')
-                }
-
-            }, 4000);
-        }
-    }
-
-    function openPetModal(e){
-        id = e.currentTarget.getAttribute('id').replace('pet-card-', '')
-        let referenceForModal = 'modal-pet-' + id
-        let modal = document.getElementById(referenceForModal)
-        modal.classList.remove('hidden')
-        
-        let referenceForCarrousel = 'carrousel-' + id
-        let carrousel = document.getElementById(referenceForCarrousel)
-        let referenceForCarrouselIndicators = '.carrousel-indicator-' + id
-        carrouselIndicators = document.querySelectorAll(referenceForCarrouselIndicators)
-
-        triggerCarrousel(carrousel, carrouselIndicators)
-    }
-
-
-    let modals = document.querySelectorAll('.modal-pet-container')
-    modals.forEach(modal => {
-        modal.addEventListener('click', closeModal)
-    })
-
-    function closeModal(e){
-        clickedOutOfModal = e.target.classList.contains('modal-pet-container')
-        if (clickedOutOfModal == true){
-            e.currentTarget.classList.add('hidden')
-        }
-
-        target = e.currentTarget
-        id = e.currentTarget.getAttribute('id').replace('modal-pet-', '')
-        let referenceForCarrousel = 'carrousel-' + id
-        let carrousel = document.getElementById(referenceForCarrousel)
-
-        if(e.target.classList.contains('modal-pet-container')){
-            carrousel.style.transform = 'translateX(0%)'    
-            clearInterval(carrouselInterval)
-        }
-    }
-
-
-</script>
-
+<script src="{% static 'js/modalPet.js' %}"></script>
 {% endblock %}
