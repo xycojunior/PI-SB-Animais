@@ -34,8 +34,22 @@ def paginator(request, pets):
         'pages':int(pages)
     }
 
-def landingPage(request):
-    return render(request, 'homeOficial.html')
+class landingPage(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            try:
+                defaultUser = DefaultUser.objects.get(fk_user=request.user)
+                return redirect('/home/')
+            except DefaultUser.DoesNotExist:
+                pass
+        
+            try:
+                empresa = Empresa.objects.get(fk_user=request.user)
+                return redirect('/home/')
+            except Empresa.DoesNotExist:
+                pass
+        else:
+            return render(request, 'homeOficial.html')
 
 class homePage(View):
     #@method_decorator(login_required)
@@ -44,7 +58,7 @@ class homePage(View):
 
         pets = []
 
-        for pet in getPetsAdot(request.user, search):
+        for pet in getPetsAdot(request, search):
             imgs = ImagemPet.objects.filter(fk_pet = pet)
             pets.append(
                 {
@@ -165,13 +179,16 @@ class editarPet(View):
             imgForm.save()
             return redirect('/meus_Pets/')
 
-class meusPets(View):
+class meuPerfil(View):
     @method_decorator(login_required)
+    @method_decorator(defaultUserRequired)
     def get(self, request,):
         search = request.GET.get('Search') if request.GET.get('Search') != None else ''
     
         pets = []
+        pets_fav = []
 
+        user = getDefaultUser(request.user)
 
         for pet in getMyPets(request.user, search):
             imgs = ImagemPet.objects.filter(fk_pet = pet)
@@ -180,32 +197,45 @@ class meusPets(View):
                     'pet' : pet,
                     'imgs': imgs}
                 )
+            
+        for favorito in getFavoritePets(request.user, search):
+            imgs = ImagemPet.objects.filter(fk_pet = favorito.fk_pet)
+            pet = favorito.fk_pet
+            pets_fav.append(
+                {
+                    'pet' : pet,
+                    'imgs': imgs}
+                )
         
-        pag = paginator(request, pets)
-        
+        pag = paginator(request, pets)  
+        pag_fav = paginator(request, pets_fav)   
+
         context = {
             'User' : request.user,
+            'info':user,
             'pets' : pag['pet_page'],
+            'pets_fav' :pag_fav['pet_page'],
             'page' : pag['page'],
             'nextPage' : pag['nextPage'], 
             'prevPage' : pag['prevPage'],
             'pages': pag['pages'],
             'petName' : search,
-            'type': 'Meus Pets'
+            'type': 'Meus Pets',
         }
         
         return render(request, 'adocao/pets.html', context)
 
 class petsPerdidos(View):
-    @method_decorator(login_required)
     def get(self, request):
         search = request.GET.get('Search') if request.GET.get('Search') != None else ''
     
         pets = []
 
-
-        for pet in getLostPets(request.user, search):
-            imgs = ImagemPet.objects.filter(fk_pet = pet.fk_pet)
+        
+        for lostPet in getLostPets(request, search):
+            print(lostPet)
+            pet = lostPet.fk_pet
+            imgs = ImagemPet.objects.filter(fk_pet = pet)
             pets.append(
                 {
                     'pet' : pet,
@@ -213,31 +243,44 @@ class petsPerdidos(View):
                 )
         
         pag = paginator(request, pets)
+        if request.user.is_authenticated:
+            context = {
+                'User' : request.user,
+                'pets' : pag['pet_page'],
+                'page' : pag['page'],
+                'nextPage' : pag['nextPage'], 
+                'prevPage' : pag['prevPage'],
+                'pages': pag['pages'],
+                'petName' : search,
+                'type': 'Perdidos'
+            }
+        else:
+            context = {
+                'pets' : pag['pet_page'],
+                'page' : pag['page'],
+                'nextPage' : pag['nextPage'], 
+                'prevPage' : pag['prevPage'],
+                'pages': pag['pages'],
+                'petName' : search,
+                'type': 'Perdidos'
+            }
         
-        context = {
-            'User' : request.user,
-            'pets' : pag['pet_page'],
-            'page' : pag['page'],
-            'nextPage' : pag['nextPage'], 
-            'prevPage' : pag['prevPage'],
-            'pages': pag['pages'],
-            'petName' : search,
-            'type': 'Meus Pets'
-        }
-        
-        return render(request, 'adocao/pets.html', context)
+        return render(request, 'perdidos/petsPerdidos.html', context)
 
 
 class adotarPet(View):
     def get(self, request, petId, doadorId):
-        doador = User.objects.get(id=doadorId)
-        pet = Pet.objects.get(id=petId)
-        donatario = request.user
 
-        print(doador)
+        if request.user.is_authenticated:
+            doador = User.objects.get(id=doadorId)
+            pet = Pet.objects.get(id=petId)
+            donatario = request.user
 
-        Requisicoes.objects.create(fk_pet=pet, fk_doador=doador, fk_donatario=donatario)
-        return redirect('/home/')
+
+            Requisicoes.objects.create(fk_pet=pet, fk_doador=doador, fk_donatario=donatario)
+            return redirect('/home/')
+        else:
+            return redirect('/login/')
     
 class favoritarPet(View):
     def get(self, request, petId):

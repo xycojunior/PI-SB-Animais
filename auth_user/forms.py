@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.forms.widgets import NumberInput
+from django.forms.widgets import NumberInput, FileInput
 from .models import *
 
 
@@ -42,6 +42,19 @@ class DefaultUserForm(forms.ModelForm):
     
     class Meta:
         model = DefaultUser
+        fields = '__all__'
+        exclude = ('fk_user',)
+
+class PofileImageForm(forms.ModelForm):
+    img = forms.ImageField(
+        label='Imagem de perfil',
+        widget= FileInput(attrs={'accept':'.jpg, .png'}),
+        help_text='Tipos de documentos aceitos: .jpg, .png',
+        required=False
+    )
+
+    class Meta:
+        model = ProfileImage
         fields = '__all__'
         exclude = ('fk_user',)
 
