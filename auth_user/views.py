@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
 from .forms import *
+from .backends import EmailBackend
 
 class Logout(View):
     @method_decorator(login_required)
@@ -44,7 +45,7 @@ def Login(request):
                     context = {'backErrorMessage':"<div class='errors-header'>Erro de cadastro encontrado: </div><li>E-mail já está cadastrado!</li>"}
                     return render(request, 'login/login.html', context)
                 else:
-                    user = User.objects.create_user(username=email,email=email,password=password,first_name=username)
+                    user = User.objects.create_user(username=username,email=email,password=password)
                     user.save()
                     
                     user = authenticate(username=email, password=password)
@@ -59,7 +60,7 @@ class registerCliente(View):
     def get(self, request):
         clientForm = DefaultUserForm()
         addressForm = AddressForm()
-        profileImageForm = PofileImageForm()
+        profileImageForm = ProfileImageForm()
 
         context = {
             'clienteForm' : clientForm,
@@ -70,7 +71,7 @@ class registerCliente(View):
     def post(self, request):
         clientForm = DefaultUserForm(request.POST)
         addressForm = AddressForm(request.POST)
-        profileImageForm = PofileImageForm(request.POST, request.FILES)
+        profileImageForm = ProfileImageForm(request.POST, request.FILES)
         normalForms = [clientForm, addressForm, profileImageForm]
 
         if all(form.is_valid() for form in normalForms):
@@ -92,7 +93,7 @@ class registerCompany(View):
     def get(self, request):
         companyForm = CompanyForm()
         addressForm = AddressForm()
-        profileImageForm = PofileImageForm()
+        profileImageForm = ProfileImageForm()
 
         context = {
             'companyForm' : companyForm,
@@ -104,7 +105,7 @@ class registerCompany(View):
     def post(self, request):
         companyForm = CompanyForm(request.POST)
         addressForm = AddressForm(request.POST)
-        profileImageForm = PofileImageForm(request.POST, request.FILES)
+        profileImageForm = ProfileImageForm(request.POST, request.FILES)
         normalForms = [companyForm, addressForm, profileImageForm]
 
         if all(form.is_valid() for form in normalForms):
