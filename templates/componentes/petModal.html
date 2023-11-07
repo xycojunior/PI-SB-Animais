@@ -17,7 +17,7 @@
     }
 
     .modal-pet{
-        background-color: white;
+        background-color: white;    
         display: flex;
         width: 800px;
         min-height: 550px;
@@ -25,8 +25,22 @@
         overflow: hidden;
     }
 
-    .hidden{
-        display: none;
+    @keyframes openModal {
+        from{
+            transform: scale(0.5);
+            opacity: 0;
+        }
+        to{
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .animation{
+        transform-origin: bottom center;
+        animation-name: openModal;
+        animation-duration: 0.5s;
+        animation-fill-mode: forwards;
     }
 
     .carrousel-container{
@@ -46,13 +60,24 @@
         display: flex;
         flex-wrap: nowrap;
     }
-
+    
     .pet-info-container{
         width: 48%;
         box-sizing: border-box;
         padding: 1.3rem 1rem;
     }
 
+    .exit-modal-button{
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 50%;
+    }
+    
+    .exit-modal-button:hover{
+        background-color: lightgrey;
+
+    }
+    
     .modal-top{
         display: flex;
         justify-content: space-between;
@@ -60,16 +85,16 @@
         margin-bottom: 1rem;
         padding: 0 1.2rem;
     }
-
+    
     .modal-top h3{
         font-weight: bolder;
     }
-
+    
     #exit-modal-button{
-        width: 12%;
+        width: 13%;
     }
 
-
+    
     .pet-info{
         background-color: var(--greenBackground);
         border-radius: 10px;
@@ -85,29 +110,29 @@
         margin: 0;
         padding: 0;
     }
-
+    
     .pet-info li{
         margin-bottom: 0.8rem;
     }
-
+    
     .pet-info span{
         display: block;
         margin: 0;
         padding: 0;
     }
-
+    
     .info-header{
         line-height: 15px;
         color: grey;
     }
-
+    
     .pet-modal-img{
         width: 100%;
         width: inherit;
         object-fit: cover;
         flex-shrink: 0;
     }
-
+    
     .carrousel-indicators{
         display: flex;
         position: absolute;
@@ -116,7 +141,7 @@
         transform: translateX(-50%);
         z-index: 15;
     }
-
+    
     .carrousel-indicator{
         height: 12px;
         border-radius: 50%;
@@ -128,11 +153,11 @@
     .carrousel-indicator:first-of-type{
         margin-left: 0;
     }
-
+    
     .indicator-active{
         background-color: var(--greenPrincipal);
     }
-
+    
     .ud-options{
         display: block;
         text-align: center;
@@ -141,7 +166,7 @@
         margin: auto;
         margin-top: 0.8rem;
     }
-
+    
     .ud-options button{
         background-color: var(--greenPrincipal);
         color: white;
@@ -152,10 +177,21 @@
         transition: 0.2s;
         cursor: pointer;
     }
-
+    
     .ud-options button:hover{
         background-color: var(--greenSecondary);
         color: white;
+    }
+
+    .adopt-button{
+        background-color: var(--greenPrincipal);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        width: 80%;
+        padding: 0.4rem 1rem;
+        transition: 0.2s;
+        cursor: pointer;
     }
 
     .trigger-before{
@@ -190,7 +226,7 @@
         align-items: center;
         
     }
-
+    
     .trigger-after:hover{
         opacity: 1;
     }
@@ -198,7 +234,7 @@
     .trigger-before, .trigger-after{
         cursor: pointer;
     }
-
+    
     .arrow-right, .arrow-left{
         background-color: var(--greenPrincipal);
         color: white;
@@ -214,21 +250,217 @@
     .arrow-right{
         margin-right: 2rem;
     }
-
+    
     .arrow-left{
         margin-left: 2rem;
     }
-
     
+    .contact-section{
+        display: flex;
+        margin-top: 15px;
+    }
 
+
+    .contact-button{
+        background-color: var(--greenPrincipal);
+        color: white;
+        padding: 5px;
+        border: none;
+        border-radius: 10px;
+        display: block;
+        align-items: center;
+        height: 40px;
+        margin-left: 1.5rem;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+    .contact-button:hover{
+        background-color: var(--greenSecondary);
+    }
+
+    .contact-button:active{
+        transition: none;
+        background-color: var(--greenPrincipal);
+        box-shadow: inset 0 0 10px black;
+    }
+
+    .contact-div{
+        display: flex;
+        margin-left: 1rem;
+        opacity: 0;
+        transition: 0.2s;
+        position: relative;
+        bottom: 3px;
+    }
+    
+    .contact-form{
+        background-color: var(--greenPrincipal);
+        border-radius: 50%;
+        height: 45px;
+        box-sizing: border-box;
+        padding: 8px;
+        margin-left: 1rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .contact-form:hover{
+        background-color: var(--greenSecondary);
+    }
+
+    .contact-form:active{
+        transition: none;
+        background-color: var(--greenPrincipal);
+        box-shadow: inset 0 0 10px black;
+    }
+    
+    .contact-form img{
+        height: 100%;
+    }
+    
+    
+    .visible{
+        opacity: 1;
+    }
+    
+    .requests-button{
+        background-color: var(--greenPrincipal);
+        color: white;
+        padding: 7px;
+        border: none;
+        border-radius: 10px;
+        transition: 0.2s;
+    }
+    
+    .requests-button:hover{
+        background-color: var(--greenSecondary);
+    }
+    
+    .modal-request{
+        width: 100vw;
+        height: 100vh;
+        box-sizing: border-box;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 50;
+        background-color: rgba(46, 46, 46, 0.801);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-request > div{
+        background-color: white;
+        padding: 1.5rem;
+        box-sizing: border-box;
+        width: 400px;
+        border-radius: 20px;
+    }
+
+    .requests-top-bar{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .exit-request-button{
+        position: relative;
+        bottom: 4px;
+        width: 35px;
+        height: 35px;
+        padding: 5px;
+        box-sizing: border-box;
+        cursor: pointer;
+        border-radius: 50%;
+    }
+
+    .exit-request-button:hover{
+        background-color: lightgray;
+    }
+
+    .request-container{
+        margin-top: 1rem;
+        background-color: var(--greenSecondary);
+        border-radius: 10px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    
+    .request-container h6{
+        margin-bottom: 5px;
+        font-weight: bolder;
+    }
+    
+    .request-container p{
+        margin-bottom: 0;
+    }
+
+    .request-buttons{
+        display: flex;
+        justify-content: end;
+    }
+
+    .request-buttons button{
+        border: none;
+        padding: 3px 5px;
+        border-radius: 10px;
+        transition: 0.2s;
+    }
+
+    .request-buttons .accept{
+        background-color: var(--greenPrincipal);
+        color: white;
+        margin-right: 0.5rem;
+    }
+
+    .request-buttons .accept:hover{
+        background-color: rgb(20, 102, 61);
+    }
+
+    .request-buttons .refuse{
+        background-color: rgb(255, 105, 105);
+        color: white;
+    }
+
+    .request-buttons .refuse:hover{
+        background-color: red;
+    }
+    
+    .hidden{
+        display: none;
+    }
+    
 </style>
+
+{% if pet.requests %}
+<div class="modal-request hidden" id="modal-request-{{pet.pet.id}}">
+    <div>
+        <div class="requests-top-bar">
+            <h4>Solicitações desse pet:</h4>
+            <img src="{% static 'imgs/iconx.svg' %}" alt="X icon" class="exit-request-button">
+        </div>
+        {% for request in pet.requests %}
+                <div class="request-container">
+                    <h6>De: {{request.fk_donee}}</h6>
+                    <p>{{request.requestText}}</p>
+                    <div class="request-buttons">
+                        <a href="{% url 'marcarAdotado' pet.pet.id %}"><button class="accept">Aceitar</button></a>
+                        <button class="refuse">Recusar</button>
+                    </div>
+                </div>
+                {% endfor %}
+        </div>
+    </div>
+{% endif %}
 
 <div class="modal-pet-container hidden" id="modal-pet-{{pet.pet.id}}">
     <div class="modal-pet">
         <div class="carrousel-container">
             <div class="carrousel-content" id="carrousel-{{pet.pet.id}}">
                 {% for img in pet.imgs %}
-                    <img src="{{img.img.url}}" alt="pet image" class="pet-modal-img">
+                <img src="{{img.img.url}}" alt="pet image" class="pet-modal-img">
                 {% endfor %}
             </div>
 
@@ -242,8 +474,8 @@
         </div>
         <div class="pet-info-container">
             <div class="modal-top">
-                <h3>{{pet.pet.nome}}</h3>
-                <img src="{% static 'imgs/iconx.svg' %}" alt="X icon" id="exit-modal-button">
+                <h3>{{pet.pet.name}}</h3>
+                <img src="{% static 'imgs/iconx.svg' %}" alt="X icon" id="exit-modal-button" class="exit-modal-button">
             </div>
             <div class="pet-info">
                 <ul>
@@ -277,19 +509,41 @@
                     </li>
                 </ul>
             </div>
-                
-                <p>{{pet.contacts.email}}</p>
-                <p>{{pet.contacts.tel}}</p>
-
-                {% if type == 'Meus Pets' %}
-                <a href="{% url 'editarPet'  pet.pet.id  %}" class="ud-options"><button>Editar Pet</button></a>
-                <a href="" class="ud-options"><button>Excluir Pet</button></a>
-                {% elif type == 'Adoção' %}
-                <a href="{% url 'favoritarPet' pet.pet.id %}" class="ud-options"><button>Tenho Interesse</button></a>
-                <a href="{% url 'adotarPet' pet.pet.id pet.pet.fk_user.id %}" class="ud-options"><button>Adotar</button></a>
-
-                {% elif type == 'Perdidos' %}
-                <a href="{% url 'editarPet'  pet.pet.id  %}" class="ud-options"><button>Entrar em Contato</button></a>
+                {% if pet.type == 'adot' %}
+                    {% if pet.favoritePet %}
+                        <a href="{% url 'favoritarPet' pet.pet.id %}" class="ud-options"><button>Remover Interesse</button></a>
+                    {% else %}
+                        <a href="{% url 'favoritarPet' pet.pet.id %}" class="ud-options"><button>Tenho Interesse</button></a>
+                    {% endif %}
+                    <button class="ud-options adopt-button" petId="{{pet.pet.id}}" userId="{{pet.pet.fk_user.id}}">Adotar</button>
+                    
+                    <!-- {% url 'adotarPet' pet.pet.id pet.pet.fk_user.id %} -->
+                {% elif pet.type == 'lost' %}
+                    <div class="contact-section">
+                        <button class="contact-button" id="contactButton-{{pet.pet.id}}">Entrar em Contato</button>
+                        <div class="contact-div" id="contactDiv-{{pet.pet.id}}">
+                            <a href="https://wa.me/55{{pet.contacts.tel}}?text=Opa%20{{pet.pet.fk_user}}%2C%20me%20chamo%20{{request.user}}%2C%20sou%20usu%C3%A1rio%20do%20AdotPets%20tenho%20informa%C3%A7%C3%B5es%20sobre%20seu%20pet%20perdido%20{{pet.pet.name}}!" target="_blank">
+                                <div class="contact-form">
+                                    <img src="{% static 'imgs/whatsappIcon.svg' %}" alt="whatsapp icon">
+                                </div>
+                            </a>
+                            <a href="mailto:{{pet.contacts.email}}?subject=Informa%C3%A7%C3%B5es%20sobre%20Pet%20Perdido%20{{pet.pet.name}}!&body=Opa%20{{pet.pet.fk_user}}%2C%20me%20chamo%20{{request.user}}%2C%20sou%20usu%C3%A1rio%20do%20AdotPets%20tenho%20informa%C3%A7%C3%B5es%20sobre%20seu%20pet%20perdido%20{{pet.pet.name}}!">
+                                <div class="contact-form">
+                                    <img src="{% static 'imgs/emailIcon.svg' %}" alt="email icon">
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                {% elif pet.type == 'myLostPets' %}
+                    
+                    <a href="{% url 'editarPet'  pet.pet.id  %}" class="ud-options"><button>Editar Pet</button></a>
+                    <a href="{% url 'marcarAdotado' pet.pet.id %}" class="ud-options"><button>Marcar Como Encontrado</button></a>
+                {% elif pet.type == 'requested' %}
+                    <a href="{% url 'editarPet'  pet.pet.id  %}" class="ud-options"><button>Editar Pet</button></a>
+                    <button class="ud-options requests-button" type="button" petId="{{pet.pet.id}}">Ver solicitações</button>
+                {% elif pet.type == 'myPets' %}
+                    <a href="{% url 'editarPet'  pet.pet.id  %}" class="ud-options"><button>Editar Pet</button></a>
+                    <a href="{% url 'marcarAdotado' pet.pet.id %}" class="ud-options"><button>Marcar Como Adotado</button></a>
                 {% endif %}
         </div>
     </div>

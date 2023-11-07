@@ -6,18 +6,77 @@
     <div class="object">
         <div class="nav-container">
             <nav class="nav-options">
-                <li><a href="{% url 'home' %}">Explorar</a></li>
-                <li><a href="#">Loja</a> </li>
-                <li><a href="{% url 'petsPerdidos' %}">Animais perdidos</a> </li>
-                {% if User %}
-                    <a href="{% url 'perfil' %}">
-                        <li>{{User}}</li>
-                    </a>
-                    <a href="{% url 'logout' %}">Sair</a>
+                {% if info.company %}
+                    <a href="{% url 'homeCompany' %}">Meus Pets</a> 
+                    <a href="{% url 'verLoja' request.user.id %}">Produtos</a>
+                    <a href="">Serviços</a>
                 {% else %}
-                    <li class="nav-option-active"><a href="{% url 'login' %}">Acessar Conta</a></li>
+                    <a href="{% url 'home' %}">Explorar</a>
+                    <a href="{% url 'produtos' %}">Loja</a>
+                    <a href="{% url 'petsPerdidos' %}">Animais perdidos</a>
+                    {% if info.user %}
+                        <a href="{% url 'processos' %}">Processos</a>
+                    {% endif %}
+                {% endif %}
+                {% if info.user %}
+                    <div class="imgPerfil">
+                        
+                        <img class="buttonPerfil" src="{{info.profileImage.img.url}}" alt="">
+
+                        <div class="dropDown dropPerfil none">
+                            <a href="{% url 'perfil' %}">
+                                {{info.user}}
+                            </a>
+                            <a href="{% url 'logout' %}">Sair</a>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="notifications">
+                        <img class="buttonNot" src="{% static 'imgs/notifications.svg' %}" alt="">
+
+                        <div class="dropDown dropNot none">
+                            {% for noti in info.notifications %}
+                                <a href="#">{{noti.mensage}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                {% else %}
+                    <a href="{% url 'login' %}">Acessar Conta</a>
                 {% endif %}
             </nav>
         </div>
     </div>
 </div>
+
+<script>
+    var button = document.querySelector('.buttonNot')
+    var buttonPerfil = document.querySelector('.buttonPerfil')
+
+    function addRemove(elemnent){
+        if(elemnent.classList.contains("none")){
+            elemnent.classList.remove('none')
+        }
+        else{
+            elemnent.classList.add('none')
+        }
+    }
+
+    button.addEventListener('click', function(e){
+        var drop = document.querySelector('.dropNot')
+        var dropPerfil = document.querySelector('.dropPerfil')
+
+        dropPerfil.classList.add('none')
+        addRemove(drop)
+        
+    })
+
+    buttonPerfil.addEventListener('click', function(e){
+        var drop = document.querySelector('.dropPerfil')
+        var dropNot = document.querySelector('.dropNot')
+
+        dropNot.classList.add('none')
+        addRemove(drop)
+    })
+</script>

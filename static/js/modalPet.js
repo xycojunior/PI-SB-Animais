@@ -81,6 +81,9 @@
         let referenceForModal = 'modal-pet-' + id
         let modal = document.getElementById(referenceForModal)
         modal.classList.remove('hidden')
+        modal.children[0].classList.add('animation')
+        
+        
         
         let referenceForCarrousel = 'carrousel-' + id
         let carrousel = document.getElementById(referenceForCarrousel)
@@ -98,8 +101,10 @@
 
     function closeModal(e){
         clickedOutOfModal = e.target.classList.contains('modal-pet-container')
-        if (clickedOutOfModal == true){
+        clickedXButton = e.target.classList.contains('exit-modal-button')
+        if (clickedOutOfModal == true || clickedXButton == true){
             e.currentTarget.classList.add('hidden')
+            e.currentTarget.classList.remove('animation')
         }
 
         target = e.currentTarget
@@ -119,3 +124,52 @@
             iterator = 0
         }
     }
+
+    // Contact options for lost pets
+    
+    let contactButtons = document.querySelectorAll(".contact-button")
+    contactButtons.forEach(button => {
+        button.addEventListener("click", toggleContactDiv)
+    })
+
+    function toggleContactDiv(e){
+        button = e.target
+        id = button.getAttribute('id').replace("contactButton-", "")
+        referenceForContactDiv = "#contactDiv-" + id
+        div = document.querySelector(referenceForContactDiv)
+        div.classList.toggle("visible");
+    }
+    
+    let requestText = document.querySelector('#requestTextContainer')
+    let request = document.querySelector('#requestText')
+    let exitRequestTextButton = document.querySelector("#exitRequestText")
+    requestText.addEventListener('click', modalClose)
+    exitRequestTextButton.addEventListener('click', hideRequestText)
+
+    function hideRequestText(){
+        requestText.classList.add('hidden')
+        request.value = ""
+    }
+
+    function modalClose(e){
+        target = e.target
+        id = target.getAttribute('id')
+        if(id == 'requestTextContainer'){
+            hideRequestText()
+        }
+    }
+
+    function toggleRequestText(e){
+        petId = e.target.getAttribute('petId')
+        document.querySelector("#requestIdPet").setAttribute('value', petId)
+
+        userId = e.target.getAttribute('userId')
+        document.querySelector("#requestIdUser").setAttribute('value', userId)
+    
+        requestText.classList.toggle('hidden')
+    }
+
+    let adoptButtons = document.querySelectorAll('.adopt-button')
+    adoptButtons.forEach(button => {
+        button.addEventListener("click", toggleRequestText)
+    })

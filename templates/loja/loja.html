@@ -1,0 +1,26 @@
+{% extends '../componentes/base.html' %}
+{% load static %}
+
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/meus_pets.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+<main class="product-section">
+  <h1>Loja</h1>
+  {% include '../componentes/searchProduct.html' %}
+
+  <article class="products">
+    {% for item in productsList %}
+      {% include '../componentes/productCard.html' %}
+    {% endfor %}
+  </article>
+  
+</main>
+{% endblock %}
+
+
+

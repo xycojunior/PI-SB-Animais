@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'auth_user',
     'pages',
+    'store',
 
     'PIL'
 ]
@@ -141,3 +142,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTHENTICATION_BACKENDS = [
     'auth_user.backends.EmailBackend'
     ]
+
+#email configuration
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'adotpets.oficial@gmail.com'
+EMAIL_HOST_PASSWORD = 'fumvuebfecyfmvkk'

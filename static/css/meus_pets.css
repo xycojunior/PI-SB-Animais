@@ -26,36 +26,13 @@ h1{
 
 
 .my-pets{
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 21% 21% 21% 21%; /* Configurando o tamanho do Pet para 21% */ 
     justify-content: space-between;
     box-sizing: border-box;
     width: 100%;
 }
 
-.search-pet-form{
-    margin-bottom: 2rem;
-}
-
-.search-pet-form input{
-    border-radius: 10px;
-    border: 1px solid lightgrey;
-    padding: 0.3rem 0.5rem;
-    width: 35%;
-}
-
-.search-pet-form button{
-    background-color: var(--greenPrincipal);
-    color: white;
-    border: None;
-    border-radius: 10px;
-    margin-left: 1.5rem;
-    padding: 0.3rem 1rem;
-}
-
-.pet-card{
-    width: 21%;
-}
 
 .perfil-photo{
     width: 200px;
@@ -155,6 +132,22 @@ label{
     width: 100%;
     border-radius: 16px;
     padding: 1rem .5rem;
+    transition: .3s;
+}
+
+.card_edit .buttons img{
+    opacity: .5;
+    transition: .2s;
+}
+
+.card_edit .buttons img:hover{
+    opacity: 1;
+}
+
+.card_edit div div{
+    width: 320px;
+    display: flex;
+    flex-direction: column;
 }
 
 .btnEdit:hover{
@@ -166,6 +159,93 @@ label{
     display: flex;
 }
 
+.buttons button{
+    background-color: transparent;
+    border: 0;
+    margin-left: 0.9rem;
+    margin-right: 0.3rem;
+    transition: 0.3s;
+}
+
+.buttons button:hover{
+    filter: brightness(1.2);
+    transform: scale(1.1);
+}
+
 .none{
+    display: none;
+}
+
+.not-found-image{
+    width: 500px;
+    display: block;
+    margin: auto;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+#requestText{
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 1rem;
+    resize: none;
+    font-size: 20px;
+}
+
+#requestTextContainer{
+    box-sizing: border-box;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    z-index: 25;
+    background-color: rgba(0, 0, 0, 0.651);
+}
+
+.request-text-around{
+    border-radius: 10px;
+    background-color: white;
+    padding: 2rem;
+    width: fit-content;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 600px;
+}
+
+.request-text-buttons{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+#sendRequestText, #exitRequestText{
+    background-color: var(--greenPrincipal);
+    color: white;
+    padding: 7px 0;
+    border: none;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: 0.2s;
+}
+
+#sendRequestText:hover, #exitRequestText:hover{
+    background-color: var(--greenSecondary);
+    color: white;
+}
+
+#sendRequestText{
+    width: 55%;
+}
+
+#exitRequestText{
+    width: 35%;
+}
+
+.hidden{
     display: none;
 }
