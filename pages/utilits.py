@@ -63,25 +63,28 @@ def getFavoritePets(user, search):
 
 # Returns defaultUser information
 def getDefaultUser(user):
-    address = Address.objects.get(fk_user=user)
-    defaultUser = DefaultUser.objects.get(fk_user=user)
-    profileImage = ProfileImage.objects.filter(fk_user=user).first()
-    notifications = Notification.objects.filter(fk_donor=user)
+    if user.is_authenticated:
+        address = Address.objects.get(fk_user=user)
+        defaultUser = DefaultUser.objects.get(fk_user=user)
+        profileImage = ProfileImage.objects.filter(fk_user=user).first()
+        notifications = Notification.objects.filter(fk_donor=user)
 
-    pestCount = Pet.objects.filter(fk_user=user).count()
-    favoritesPets = Favorites.objects.filter(fk_donee=user).count()
-    adoptedPets = LogExit.objects.filter(fk_donee=user).count()
+        pestCount = Pet.objects.filter(fk_user=user).count()
+        favoritesPets = Favorites.objects.filter(fk_donee=user).count()
+        adoptedPets = LogExit.objects.filter(fk_donee=user).count()
 
-    user_list = {
-        'user':user,
-        'defaultUser':defaultUser,
-        'profileImage':profileImage,
-        'address':address,
-        'petsCount':pestCount,
-        'favoritePets':favoritesPets,
-        'adoptedPets':adoptedPets,
-        'notifications':notifications,
-        }
+        user_list = {
+            'user':user,
+            'defaultUser':defaultUser,
+            'profileImage':profileImage,
+            'address':address,
+            'petsCount':pestCount,
+            'favoritePets':favoritesPets,
+            'adoptedPets':adoptedPets,
+            'notifications':notifications,
+            }
+    else:
+        user_list = None
     
     return user_list
 
@@ -151,7 +154,6 @@ def getTestLostPets(pet):
 
 def redirecionar_usuario(user):
     user_type = getUserType(user)
-    print(user_type)
     if user_type == 'defaultUser':
         return redirect('home')
     elif user_type == 'company':
@@ -162,3 +164,21 @@ def getAllProcuts(search):
     products = Product.objects.filter(Q(name__istartswith = search) | Q(category__istartswith = search))
 
     return products
+
+def getProductInfo(product):
+    img = ProductImage.objects.get(fk_product = product)
+
+    divided = 0
+    if product.divided:
+        divided = "{:.2f}".format(product.value / product.divided)
+
+    product.value = "{:.2f}".format(product.value)
+    
+    if product.discount:
+        product.discount = "{:.2f}".format(product.discount)
+    
+    return {
+        'product' : product,
+        'img' : img,
+        'divided' : divided
+    }

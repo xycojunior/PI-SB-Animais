@@ -6,8 +6,14 @@
     --greenSecondary: #A5EBC8;
     --greenBackground: #EBF8F1;
     --alternativeColor: #698778;
+    --cancelColor: #FF9292;
     --containerMargin: 1rem;
     --main-font: 'Public Sans'
+}
+
+.nProdutos, .nServs, .nPedidos, .nHomeComp, .nExplorar, .nLoja, .nLost, .nMeusPedidos, .nProcessos, .nCart{
+    background-color: var(--greenSecondary);
+    border-radius: 10px;
 }
 
 * {
@@ -17,7 +23,7 @@
 
 body {
     font-size: 16px;
-    background-color: var(--greenBackground);
+    background-color: white;
     font-family:  var(--main-font);
 }
 
@@ -26,13 +32,17 @@ a {
 }
 
 .top-section {
-    margin: 50px 0;
+    padding: 2rem 0;
     display: flex;
     justify-content: space-around;
     align-items: center;
     width: 100%;
-    height: 70px;
     font-size: 16px;
+    background-color: var(--greenBackground);
+}
+
+h1{
+    margin-top: 2rem;
 }
 
 .object {
@@ -41,8 +51,7 @@ a {
 }
 
 .nav-container {
-    width: 525px;
-    height: 70px;
+    width: fit-content;
 }
 
 .nav-options {
@@ -51,20 +60,21 @@ a {
     align-items: center;
     list-style: none;
     background-color: white;
-    padding: 15px 7px;
     border-radius: 13px;
+    height: 60px;
 }
 
 .nav-options a {
     color: #000000;
-    font-size: 20px;
+    font-size: 1.1rem;
     padding: 2px 12px;
     transition: .2s;
+    margin: 0rem .5rem;
 }
 
 .nav-options a:hover{
     background-color: var(--greenSecondary);
-    border-radius: 20px;
+    border-radius: 10px;
     transform: scale(1.1);
 }
 
@@ -112,6 +122,7 @@ a {
 
 .notifications{
     position: relative;
+    margin-right: .5rem;
 }
 
 .notifications img{

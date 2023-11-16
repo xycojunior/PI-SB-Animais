@@ -15,6 +15,10 @@ from django.db.models import Q
 from .utilits import *
 from auth_user.forms import *
 from django.core.mail import send_mail
+from django.http import HttpResponse
+from django.contrib import messages
+from chat.models import Room, Message
+from chat.views import chatRoom
 
 # Create your views here.
 
@@ -76,6 +80,8 @@ class homePage(View):
             'prevPage' : pag['prevPage'],
             'pages': pag['pages'],
             'petName' : search,
+            'nExplorar' : 'nExplorar'
+
         }
         else:
             context = {
@@ -85,7 +91,9 @@ class homePage(View):
             'prevPage' : pag['prevPage'],
             'pages': pag['pages'],
             'petName' : search,
+            'nExplorar' : 'nExplorar'
         }
+            
         return render(request, 'adocao/animais.html', context)
 
     def post(self, request):
@@ -109,7 +117,9 @@ class homePage(View):
                     [email], #Destinatário
                     fail_silently=False
                 )
- 
+                
+                messages.success(request, "Solicitação enviada!")
+
                 return redirect('/home/')
             else:
                 return redirect('/login/')
@@ -215,12 +225,16 @@ class meuPerfil(View):
         profileImageForm = ProfileImageForm(instance=profileImage)
 
         search = request.GET.get('Search') if request.GET.get('Search') != None else ''
+
+        
     
         pets = []
         pets_fav = []
 
 
         user = getDefaultUser(request.user)
+
+        
         for pet in getMyPets(request.user, search):
             imgs = ImagePet.objects.filter(fk_pet = pet)
             if getTestLostPets(pet) == False:
@@ -238,11 +252,13 @@ class meuPerfil(View):
                         'type':'myLostPets'}
                     )
             
+        
+        
         for favorite in getFavoritePets(request.user, search):
             pet = favorite.fk_pet
             imgs = ImagePet.objects.filter(fk_pet = favorite.fk_pet)
             contacts = getUserContacts(request, pet)
-            favoritePet = getTestFavoritePets(pet)
+            favoritePet = getTestFavoritePets(pet, request.user)
             pets_fav.append(
                 {
                     'pet' : pet,
@@ -251,6 +267,7 @@ class meuPerfil(View):
                     'type': "adot",
                     'favoritePet':favoritePet}
                 )
+        
         
         pag = paginator(request, pets)  
         pag_fav = paginator(request, pets_fav)   
@@ -322,7 +339,8 @@ class petsPerdidos(View):
                 'prevPage' : pag['prevPage'],
                 'pages': pag['pages'],
                 'petName' : search,
-                'type': 'Perdidos'
+                'type': 'Perdidos',
+                'nLost': 'nLost'
             }
         else:
             context = {
@@ -332,7 +350,8 @@ class petsPerdidos(View):
                 'prevPage' : pag['prevPage'],
                 'pages': pag['pages'],
                 'petName' : search,
-                'type': 'Perdidos'
+                'type': 'Perdidos',
+                'nLost': 'nLost'
             }
         
         return render(request, 'perdidos/petsPerdidos.html', context)
@@ -366,17 +385,20 @@ class adotarPet(View):
     
 class favoritePet(View):
     def get(self, request, petId):
-        pet = Pet.objects.get(id=petId)
-        donee = request.user
-        mensage = "O usuário " + donee.username + " está interessado no seu Pet " + pet.name
-        testePet = Favorites.objects.filter(fk_pet=pet, fk_donee=donee)
-        
-        if len(testePet) == 0:
-            Notification.objects.create(fk_pet=pet, fk_donee=donee, fk_donor=pet.fk_user, mensage=mensage)
-            Favorites.objects.create(fk_pet=pet, fk_donee=donee)
+        if request.user.is_authenticated:
+            pet = Pet.objects.get(id=petId)
+            donee = request.user
+            mensage = "O usuário " + donee.username + " está interessado no seu Pet " + pet.name
+            testePet = Favorites.objects.filter(fk_pet=pet, fk_donee=donee)
+            
+            if len(testePet) == 0:
+                Notification.objects.create(fk_pet=pet, fk_donee=donee, fk_donor=pet.fk_user, mensage=mensage)
+                Favorites.objects.create(fk_pet=pet, fk_donee=donee)
+            else:
+                testePet[0].delete()
+            return redirect('/home/')
         else:
-            testePet[0].delete()
-        return redirect('/home/')
+            return redirect('login')
     
 
 class MarcarAdotado(View):
@@ -411,7 +433,7 @@ def processos(request):
 
 
         #Pegar pets solicitados!
-        solicitado = Requests.objects.filter(fk_pet=pet)
+        solicitado = Requests.objects.filter(fk_pet=pet).filter(state="REQUESTED")
         if solicitado.count() > 0:
             requests = Requests.objects.filter(fk_pet=pet)
             imgs = ImagePet.objects.filter(fk_pet=pet)
@@ -443,6 +465,13 @@ def processos(request):
 
         #Pegar pets já adotados
         if pet.adopted == True:
+            requests = Requests.objects.filter(fk_pet=pet).filter(state="ACCEPTED")
+            if requests.count() == 0:
+                requests = False
+                activeRequest = False
+            else:
+                activeRequest = requests.first()
+                
             imgs = ImagePet.objects.filter(fk_pet=pet)
             contacts = getUserContacts(request, pet)
             petsAdotados.append(
@@ -451,7 +480,8 @@ def processos(request):
                     'imgs': imgs,
                     'contacts':contacts,
                     'type': "adopted",
-                    'requests': False,
+                    'requests': requests,
+                    'activeRequest': activeRequest,
                 }
             )
         
@@ -464,7 +494,69 @@ def processos(request):
     if len(petsAdotados) == 0:
         petsAdotados = "Empty"
 
-    context = {'info':getDefaultUser(request.user), 'petsEmAdocao':petsEmAdocao, 'petsSolicitados':petsSolicitados, 'petsAdotados':petsAdotados}
+
+    if request.method == 'POST' and "result" in request.POST:
+        id = request.POST.get("request_id")
+        solicitacao = Requests.objects.get(id=id)
+        pet = Pet.objects.get(id=solicitacao.fk_pet.id)
+        donor = solicitacao.fk_donor.username
+        donee = solicitacao.fk_donee.email
+        donee_username = solicitacao.fk_donee.username
+
+        if request.POST.get('result') == "Aceitar":
+            solicitacoes = Requests.objects.filter(fk_pet=pet)
+            for item in solicitacoes:
+                item.state = "DENIED"
+                item.save()
+
+            solicitacao.state = "ACCEPTED"
+            solicitacao.save()
+            pet.adopted = True
+            pet.save()
+            message = donor + " aceitou sua solicitação pelo pet " + pet.name
+            send_mail(
+                "Solicitação de adoção Aceita!", #Título do email
+                message, #Mensagem do email 
+                'settings.EMAIL_HOST_USER', #Host
+                [donee], #Destinatário
+                fail_silently=False
+            )
+            mensagem = "Solicitação aceita, Pet " + pet.name + " adotado por " + donee_username +"!"
+            messages.success(request, mensagem)
+
+            return redirect('processos')
+        
+
+        elif request.POST.get('result') == "Recusar":
+            solicitacao.state = "DENIED"
+            solicitacao.save()
+            message = donor + " recusou sua solitação pelo pet " + pet.name
+
+            send_mail(
+                "Solicitação de adoção recusada!", #Título do email
+                message, #Mensagem do email 
+                'settings.EMAIL_HOST_USER', #Host
+                [donee], #Destinatário
+                fail_silently=False
+            )
+
+            mensagem = "Solicitação de " + donee_username + " pelo pet " + pet.name + " recusada!"
+            messages.success(request, mensagem)
+            return redirect('processos')
+
+    elif request.method == "POST" and "goToChat" in request.POST:
+        donee = User.objects.get(username=request.POST.get("donee"))
+        try:
+            room = Room.objects.get(fk_donor = request.user, fk_donee=donee)
+        except: 
+            room = Room.objects.create(fk_donor=request.user, fk_donee=donee)
+
+        return redirect("chat", pk=room.id)
+
+    context = {
+        'info':getDefaultUser(request.user), 'petsEmAdocao':petsEmAdocao, 'petsSolicitados':petsSolicitados, 'petsAdotados':petsAdotados,
+        'nProcessos' : 'nProcessos'
+        }
 
     return render(request, 'processos/processos.html', context)
 
