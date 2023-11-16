@@ -25,6 +25,8 @@ services:
     image: app:PI-SB-ANIMAIS
     container_name: pi-animais-1
     command: python manage.py runserver 0.0.0.0:8000
+    deploy:
+      replicas: 3  # Número desejado de réplicas
 
   app-2:
     build: .
@@ -39,3 +41,5 @@ services:
     image: app:PI-SB-ANIMAIS
     container_name: pi-animais-2
     command: python manage.py runserver 0.0.0.0:9000
+    deploy:
+      replicas: 3  # Número desejado de réplicas
